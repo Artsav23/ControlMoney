@@ -1,12 +1,12 @@
 package com.example.controlmoney
-import android.animation.ValueAnimator
-import android.content.Context
-import android.graphics.Canvas
+import android.view.View
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Canvas
+import android.content.Context
 import android.util.AttributeSet
-import android.view.View
+import android.animation.ValueAnimator
 
 class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
     private val listColors = listOf<Int>(
@@ -23,13 +23,13 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
     )
 
     private val paint = Paint().apply {
-        color = listColors[0]
+        color = Color.parseColor("#23238B")
         style = Paint.Style.STROKE
         strokeWidth = 30f
     }
 
     private val paintText = Paint().apply {
-        color = listColors[0]
+        color = Color.parseColor("#23238B")
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 68f
@@ -97,7 +97,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
 
     private fun drawCircle(canvas: Canvas) {
         var startAngle = 0.0
-        val oval = RectF(
+        val oval = RectF (
             centerX - radius,
             centerY - radius,
             centerX + radius,
@@ -112,9 +112,10 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
         }
     }
 
-    fun add(countMoney: Int) {
-        val color = listColors[(listColors.indices).random()]
-        financeList.add(FinanceParameters(countMoney, color))
+    fun addList(list: MutableList<StatisticFragmentsAdapter.InformationAboutFinance>) {
+        list.forEach {
+            financeList.add(FinanceParameters(it.amount.toInt(), it.color))
+        }
         countMaxFinance()
         startAnimation()
         invalidate()
@@ -122,6 +123,6 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
 
     data class FinanceParameters(
         var countMoney: Int,
-        var color: Int
+        val color: Int
     )
 }
