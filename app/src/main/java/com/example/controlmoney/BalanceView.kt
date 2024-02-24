@@ -9,27 +9,15 @@ import android.util.AttributeSet
 import android.animation.ValueAnimator
 
 class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
-    private val listColors = listOf<Int>(
-        Color.parseColor("#23238B"),
-        Color.parseColor("#009688"),
-        Color.parseColor("#673AB7"),
-        Color.parseColor("#FF9800"),
-        Color.parseColor("#00BCD4"),
-        Color.parseColor("#8AD632"),
-        Color.parseColor("#8C9EFF"),
-        Color.parseColor("#FF8A80"),
-        Color.parseColor("#FFE57F"),
-        Color.parseColor("#FF80AB")
-    )
 
     private val paint = Paint().apply {
         color = Color.parseColor("#23238B")
         style = Paint.Style.STROKE
-        strokeWidth = 30f
+        strokeWidth = 60f
     }
 
     private val paintText = Paint().apply {
-        color = Color.parseColor("#23238B")
+        color = Color.WHITE
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 68f
@@ -45,7 +33,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
     private var centerY = 0f
     private var radius = 0f
     private var angleForOneDegree = 360.0
-    private var max = 0
+    private var max = 0.0
     private var count = 0
     private var flagInit = false
 
@@ -54,6 +42,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
         startAnimation()
     }
 
+    fun count() = max
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (!flagInit) {
@@ -64,11 +53,10 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
             flagInit = true
         }
         drawCircle(canvas)
-        canvas.drawText(animatorOfAmount.animatedValue.toString(), centerX, centerY, paintText)
     }
 
     private fun countMaxFinance() {
-        max = 0
+        max = 0.0
             financeList.forEach {
             max += it.countMoney
         }
@@ -78,16 +66,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
     private fun startAnimation() {
         animator = ValueAnimator.ofFloat(0f, 1f)
         animator.apply {
-            duration = 2000
-            addUpdateListener {
-                invalidate()
-            }
-            start()
-        }
-
-        animatorOfAmount = ValueAnimator.ofInt(0, max)
-        animatorOfAmount.apply {
-            duration = 2000
+            duration = 1500
             addUpdateListener {
                 invalidate()
             }
@@ -96,6 +75,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
     }
 
     private fun drawCircle(canvas: Canvas) {
+        paint.color = Color.WHITE
         var startAngle = 0.0
         val oval = RectF (
             centerX - radius,
@@ -103,6 +83,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
             centerX + radius,
             centerY + radius
         )
+        canvas.drawArc(oval, startAngle.toFloat(), 360f, false, paint)
         financeList.forEach {
             paint.color = it.color
             val sweepAngle = angleForOneDegree * it.countMoney * animator.animatedFraction
@@ -113,8 +94,9 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
     }
 
     fun addList(list: MutableList<StatisticFragmentsAdapter.InformationAboutFinance>) {
+        financeList.clear()
         list.forEach {
-            financeList.add(FinanceParameters(it.amount.toInt(), it.color))
+            financeList.add(FinanceParameters(it.amount, it.color))
         }
         countMaxFinance()
         startAnimation()
@@ -122,7 +104,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
     }
 
     data class FinanceParameters(
-        var countMoney: Int,
+        var countMoney: Double,
         val color: Int
     )
 }

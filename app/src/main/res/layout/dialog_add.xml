@@ -31,15 +31,28 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/white" />
 
-            <EditText
-                android:id="@+id/startCapitalEditText"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Start capital"
-                android:inputType="number"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white" />
+                android:layout_height="match_parent"
+                android:gravity="right"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/startCapitalEditText"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Start capital"
+                    android:inputType="number|numberDecimal|numberSigned"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/white" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/button"

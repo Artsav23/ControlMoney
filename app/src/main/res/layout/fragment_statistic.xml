@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/color"
-    tools:context=".StatisticFragment" >
+    android:background="#20222E"
+    tools:context=".StatisticFragment">
 
     <com.example.controlmoney.BalanceView
         android:id="@+id/balanceView"
@@ -30,7 +30,7 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:background="#0B0B22"
+        android:background="#1D1D29"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintBottom_toTopOf="@+id/recycleView"
@@ -40,5 +40,16 @@
         app:title="My Finance"
         app:titleMarginStart="60dp"
         app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:titleTextColor="@color/white" />
+        app:titleTextColor="#CDFFFFFF" />
+
+    <TextView
+        android:id="@+id/countMoney"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Final amount: 0"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/balanceView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
