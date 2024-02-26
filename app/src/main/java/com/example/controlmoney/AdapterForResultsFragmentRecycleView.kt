@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.controlmoney.databinding.ItemActivityFinanceBinding
 
-class StatisticFragmentsAdapter: RecyclerView.Adapter<StatisticFragmentsAdapter.ViewHolder>() {
+class AdapterForResultsFragmentRecycleView: RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>() {
 
     private val listColors = listOf<Int>(
         Color.parseColor("#2A2A5F"),

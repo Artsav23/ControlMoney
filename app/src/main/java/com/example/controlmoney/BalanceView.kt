@@ -93,7 +93,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
         }
     }
 
-    fun addList(list: MutableList<StatisticFragmentsAdapter.InformationAboutFinance>) {
+    fun addList(list: MutableList<AdapterForResultsFragmentRecycleView.InformationAboutFinance>) {
         financeList.clear()
         list.forEach {
             financeList.add(FinanceParameters(it.amount, it.color))

@@ -15,7 +15,7 @@ import com.example.controlmoney.databinding.FragmentStatisticBinding
 class StatisticFragment : Fragment(), AddDialog.DialogCallBack {
 
     private lateinit var binding: FragmentStatisticBinding
-    private val adapter = StatisticFragmentsAdapter()
+    private val adapter = AdapterForResultsFragmentRecycleView()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

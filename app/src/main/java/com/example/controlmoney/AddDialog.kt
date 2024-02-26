@@ -17,27 +17,25 @@ class AddDialog(context: Context) : Dialog(context) {
 
     private lateinit var binding: DialogAddBinding
     private lateinit var callBack: DialogCallBack
-    private val images = listOf(
-        R.drawable.cafe,
-        R.drawable.car,
-        R.drawable.cinema,
-        R.drawable.circus,
-        R.drawable.delivery,
-        R.drawable.gym,
-        R.drawable.home,
-        R.drawable.museum
-    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DialogAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        changeStyleItem()
+        createItem()
+    }
 
-        binding.spinner.adapter = SpinnerAdapter(context, images)
-        binding.spinner.dropDownWidth = 150
+    private fun changeStyleItem() {
+        binding.cardStyleView.setOnClickListener {
+            val styleDialog = SelectStyleDialog(context)
+            styleDialog.create()
+            styleDialog.show()
+        }
+    }
 
-
-
+    private fun createItem() {
         binding.button.setOnClickListener {
             if (binding.nameEditText.text.isNullOrEmpty())
                 Toast.makeText(context, "Write name.", Toast.LENGTH_SHORT).show()
