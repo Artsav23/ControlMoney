@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.controlmoney.R
 import com.example.controlmoney.databinding.ItemRecycleViewIconsBinding
 
-class IconsAdapter: Adapter<IconsAdapter.ViewHolder>(), OnClickListenerItem {
+class IconsAdapter(val listener: ChooseIconListener): Adapter<IconsAdapter.ViewHolder>(), OnClickListenerItem {
 
     private val listIcons = listOf(
         ItemParameters(true, R.drawable.cafe),
@@ -55,13 +55,19 @@ class IconsAdapter: Adapter<IconsAdapter.ViewHolder>(), OnClickListenerItem {
         var num = 0
         listIcons.forEach {
             it.isSelected = position == num
+            if (it.isSelected)
+                listener.changeChoice(it.image)
             num ++
         }
         notifyDataSetChanged()
+
     }
 
     data class ItemParameters(
         var isSelected: Boolean,
         val image: Int
     )
+}
+interface ChooseIconListener {
+    fun changeChoice(image: Int)
 }

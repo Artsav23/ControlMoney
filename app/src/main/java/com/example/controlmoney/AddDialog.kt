@@ -42,7 +42,8 @@ class AddDialog(context: Context) : Dialog(context) {
             else {
                 val name = binding.nameEditText.text.toString()
                 val startCapital = binding.startCapitalEditText.text.toString()
-                callBack.returnData(name, checkCapital(startCapital))
+                val imageView = binding.futureIcon.id
+                callBack.returnData(name, checkCapital(startCapital), imageView)
                 dismiss()
             }
         }
@@ -59,6 +60,6 @@ class AddDialog(context: Context) : Dialog(context) {
     }
 
     interface DialogCallBack {
-        fun returnData(name: String, startCapital: Double)
+        fun returnData(name: String, startCapital: Double, image: Int)
     }
 }

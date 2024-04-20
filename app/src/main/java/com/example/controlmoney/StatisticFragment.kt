@@ -29,9 +29,14 @@ class StatisticFragment : Fragment(), AddDialog.DialogCallBack {
         binding.toolbar.setOnMenuItemClickListener {
         when (it.itemId) {
             R.id.add -> startAddDialog()
+            R.id.delete -> checkBoxVisibility()
         }
             true
         }
+    }
+
+    private fun checkBoxVisibility() {
+        adapter.checkBoxVisibility()
     }
 
     private fun startAddDialog() {
@@ -48,8 +53,8 @@ class StatisticFragment : Fragment(), AddDialog.DialogCallBack {
         binding.recycleView.layoutManager = GridLayoutManager(context, 2)
     }
 
-    override fun returnData(name: String, startCapital: Double) {
-        adapter.add(name, startCapital)
+    override fun returnData(name: String, startCapital: Double, image: Int) {
+        adapter.add(name, startCapital, image)
         binding.balanceView.addList(adapter.getList())
         startAnimation(binding.balanceView.count())
     }
