@@ -39,7 +39,7 @@
 
                 <EditText
                     android:id="@+id/startCapitalEditText"
-                    android:layout_width="250dp"
+                    android:layout_width="290dp"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="Start capital"
@@ -48,31 +48,51 @@
                     android:textColorHint="@color/white" />
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardStyleView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:cardBackgroundColor="#2A2A5F"
-                    app:cardCornerRadius="10dp">
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    app:cardBackgroundColor="#505471"
+                    app:cardCornerRadius="5dp">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/currencyTV"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="3dp"
-                        app:cardBackgroundColor="#272B33"
-                        app:cardCornerRadius="10dp">
-
-                        <ImageView
-                            android:id="@+id/futureIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:src="@drawable/home" />
-                    </androidx.cardview.widget.CardView>
-
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginRight="1dp"
+                        android:text="USD"
+                        android:textColor="@color/white"
+                        android:textSize="24sp" />
                 </androidx.cardview.widget.CardView>
 
             </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardStyleView"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="#2A2A5F"
+                app:cardCornerRadius="10dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    app:cardBackgroundColor="#272B33"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:id="@+id/futureIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:src="@drawable/home" />
+                </androidx.cardview.widget.CardView>
+
+            </androidx.cardview.widget.CardView>
 
             <Button
                 android:id="@+id/button"
@@ -81,6 +101,7 @@
                 android:backgroundTint="#1D4775"
                 android:text="Create"
                 android:textSize="20sp" />
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

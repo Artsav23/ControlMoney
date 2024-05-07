@@ -7,9 +7,10 @@ import android.view.ViewGroup
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import com.example.controlmoney.ChooseListener
 import com.example.controlmoney.R
 
-class ColorsAdapter: Adapter<ColorsAdapter.ViewHolder>(), OnClickListenerItem {
+class ColorsAdapter (private val listener: ChooseListener): Adapter<ColorsAdapter.ViewHolder>(), OnClickListenerItem {
 
     private val listColors = listOf(
         ColorParameters(Color.parseColor("#2A2A5F"), true),
@@ -59,17 +60,16 @@ class ColorsAdapter: Adapter<ColorsAdapter.ViewHolder>(), OnClickListenerItem {
     data class ColorParameters (
         val color: Int,
         var chooseFlag: Boolean
-            )
-
-    fun countColors() = listColors.size
+        )
 
     override fun clickItem(position: Int) {
         var num = 0
         listColors.forEach {
             it.chooseFlag = num == position
+            if (it.chooseFlag)
+                listener.changeColorChoice(it.color)
             num++
         }
         notifyDataSetChanged()
     }
-
 }

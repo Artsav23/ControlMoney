@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.controlmoney.databinding.ItemActivityFinanceBinding
 
 
-class AdapterForResultsFragmentRecycleView: RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>(),DeleteItem {
+class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeCountMoney): RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>(),DeleteItem {
 
     private var checkBoxVisible = false
     private val listColors = listOf<Int>(
@@ -31,28 +30,31 @@ class AdapterForResultsFragmentRecycleView: RecyclerView.Adapter<AdapterForResul
     )
 
     private var mutableListFinanceItem = mutableListOf(
-        InformationAboutFinance("Кредит", 230.0,  listColors[0], R.drawable.cafe),
-        InformationAboutFinance("Коммуналка", 560.0,  listColors[1], R.drawable.home),
-        InformationAboutFinance("Продукты", 136.38,  listColors[2], R.drawable.cinema),
-        InformationAboutFinance("Подарок на 8 марта", 60.78,  listColors[3], R.drawable.delivery),
-        InformationAboutFinance("Развлечение", 78.03,  listColors[4], R.drawable.cinema),
-        InformationAboutFinance("Ресторан", 120.45,  listColors[5], R.drawable.cafe),
-        InformationAboutFinance("Credit", 1.0,  listColors[6], R.drawable.home),
-        InformationAboutFinance("Credit", 1.0,  listColors[7], R.drawable.home),
-        InformationAboutFinance("Credit", 1.0,  listColors[8], R.drawable.home),
-        InformationAboutFinance("Credit", 1.0,  listColors[9], R.drawable.cafe),
-        InformationAboutFinance("Credit", 1.0,  listColors[10], R.drawable.home)
+        InformationAboutItemFinance("Кредит", 230.0,  listColors[0], R.drawable.cafe, "RUB"),
+        InformationAboutItemFinance("Коммуналка", 560.0,  listColors[1], R.drawable.home, "RUB"),
+        InformationAboutItemFinance("Продукты", 136.38,  listColors[2], R.drawable.cinema, "RUB"),
+        InformationAboutItemFinance("Подарок на 8 марта", 60.78,  listColors[3], R.drawable.delivery, "RUB"),
+        InformationAboutItemFinance("Развлечение", 78.03,  listColors[4], R.drawable.cinema, "RUB"),
+        InformationAboutItemFinance("Ресторан", 120.45,  listColors[5], R.drawable.cafe, "RUB"),
+        InformationAboutItemFinance("Credit", 1.0,  listColors[6], R.drawable.home, "RUB"),
+        InformationAboutItemFinance("Credit", 1.0,  listColors[7], R.drawable.home, "RUB"),
+        InformationAboutItemFinance("Credit", 1.0,  listColors[8], R.drawable.home, "RUB"),
+        InformationAboutItemFinance("Credit", 1.0,  listColors[9], R.drawable.cafe, "RUB"),
+        InformationAboutItemFinance("Credit", 1.0,  listColors[10], R.drawable.home, "RUB")
     )
     class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
 
         private var binding = ItemActivityFinanceBinding.bind(item)
 
-        fun bind(data: InformationAboutFinance, position: Int, isVisible: Boolean, listener: DeleteItem) {
+        fun bind(data: InformationAboutItemFinance, position: Int, isVisible: Boolean, listener: DeleteItem) {
             binding.cardView.setCardBackgroundColor(data.color)
+            binding.plus.setTextColor(data.color)
+            binding.minus.setTextColor(data.color)
             if (invertAmount(data.amount))
                 binding.amountTV.text = data.amount.toInt().toString()
             else
                 binding.amountTV.text = data.amount.toString()
+            binding.amountTV.text = binding.amountTV.text.toString() + " ${data.currency}"
             binding.nameTV.text = data.name
             binding.iconImage.setImageResource(data.image)
 
@@ -64,9 +66,12 @@ class AdapterForResultsFragmentRecycleView: RecyclerView.Adapter<AdapterForResul
                     override fun onAnimationRepeat(p0: Animation?) {}
                     override fun onAnimationEnd(p0: Animation?) {
                         listener.delete(position)
-                    }})
+                    }
+                })
                 itemView.startAnimation(anim)
             }
+            binding.plus.setOnClickListener {  }
+            binding.minus.setOnClickListener {  }
         }
 
         private fun invertAmount(max: Double): Boolean {
@@ -87,9 +92,8 @@ class AdapterForResultsFragmentRecycleView: RecyclerView.Adapter<AdapterForResul
         holder.bind(mutableListFinanceItem[position], position, checkBoxVisible, this)
     }
 
-    fun add(name: String, startCapital: Double, image: Int) {
-        val color = listColors.random()
-        mutableListFinanceItem.add(InformationAboutFinance(name, startCapital, color, image))
+    fun add(name: String, startCapital: Double, image: Int, color: Int, currency: String) {
+        mutableListFinanceItem.add(InformationAboutItemFinance(name, startCapital, color, image, currency))
         notifyDataSetChanged()
     }
 
@@ -100,15 +104,17 @@ class AdapterForResultsFragmentRecycleView: RecyclerView.Adapter<AdapterForResul
         notifyDataSetChanged()
     }
 
-    data class InformationAboutFinance(
+    data class InformationAboutItemFinance(
         val name: String,
         var amount: Double,
         val color: Int,
-        var image: Int
+        var image: Int,
+        val currency: String
         )
 
     override fun delete(position: Int) {
         mutableListFinanceItem.removeAt(position)
+        listener.dataSetChanged()
         notifyDataSetChanged()
     }
 }

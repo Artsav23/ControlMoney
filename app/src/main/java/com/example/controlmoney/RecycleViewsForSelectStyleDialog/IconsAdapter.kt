@@ -1,16 +1,16 @@
 package com.example.controlmoney.RecycleViewsForSelectStyleDialog
 
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import com.example.controlmoney.ChooseListener
 import com.example.controlmoney.R
 import com.example.controlmoney.databinding.ItemRecycleViewIconsBinding
 
-class IconsAdapter(val listener: ChooseIconListener): Adapter<IconsAdapter.ViewHolder>(), OnClickListenerItem {
+class IconsAdapter(private val listener: ChooseListener): Adapter<IconsAdapter.ViewHolder>(), OnClickListenerItem {
 
     private val listIcons = listOf(
         ItemParameters(true, R.drawable.cafe),
@@ -56,7 +56,7 @@ class IconsAdapter(val listener: ChooseIconListener): Adapter<IconsAdapter.ViewH
         listIcons.forEach {
             it.isSelected = position == num
             if (it.isSelected)
-                listener.changeChoice(it.image)
+                listener.changeImageChoice(it.image)
             num ++
         }
         notifyDataSetChanged()
@@ -67,7 +67,4 @@ class IconsAdapter(val listener: ChooseIconListener): Adapter<IconsAdapter.ViewH
         var isSelected: Boolean,
         val image: Int
     )
-}
-interface ChooseIconListener {
-    fun changeChoice(image: Int)
 }
