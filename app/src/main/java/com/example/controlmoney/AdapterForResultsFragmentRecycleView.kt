@@ -1,6 +1,7 @@
 package com.example.controlmoney
 
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,15 +51,17 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
             binding.cardView.setCardBackgroundColor(data.color)
             binding.plus.setTextColor(data.color)
             binding.minus.setTextColor(data.color)
+            binding.nameTV.text = data.name
+            binding.iconImage.setImageResource(data.image)
+            binding.clear.isVisible = isVisible
+
             if (invertAmount(data.amount))
                 binding.amountTV.text = data.amount.toInt().toString()
             else
-                binding.amountTV.text = data.amount.toString()
-            binding.amountTV.text = binding.amountTV.text.toString() + " ${data.currency}"
-            binding.nameTV.text = data.name
-            binding.iconImage.setImageResource(data.image)
+            binding.amountTV.text = data.amount.toString()
 
-            binding.clear.isVisible = isVisible
+            binding.amountTV.text = binding.amountTV.text.toString() + " ${data.currency}"
+
             binding.clear.setOnClickListener {
                 val anim = AnimationUtils.loadAnimation(itemView.context, R.anim.delete_anim)
                 anim.setAnimationListener(object : AnimationListener {
@@ -70,8 +73,15 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
                 })
                 itemView.startAnimation(anim)
             }
-            binding.plus.setOnClickListener {  }
-            binding.minus.setOnClickListener {  }
+            binding.plus.setOnClickListener { changeAmount(true) }
+            binding.minus.setOnClickListener { changeAmount(false) }
+        }
+
+        private fun changeAmount(plus: Boolean) {
+            val dialog = DialogChangeAmountItem(itemView.context)
+            dialog.create()
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.show()
         }
 
         private fun invertAmount(max: Double): Boolean {
