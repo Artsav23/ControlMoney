@@ -9,11 +9,11 @@ import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
 import com.example.controlmoney.databinding.ItemActivityFinanceBinding
+import androidx.recyclerview.widget.RecyclerView
 
 
-class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeCountMoney): RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>(),DeleteItem {
+class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeCountMoney): RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>(),ItemChanges {
 
     private var checkBoxVisible = false
     private val listColors = listOf<Int>(
@@ -43,17 +43,19 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         InformationAboutItemFinance("Credit", 1.0,  listColors[9], R.drawable.cafe, "RUB"),
         InformationAboutItemFinance("Credit", 1.0,  listColors[10], R.drawable.home, "RUB")
     )
-    class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
+    class ViewHolder(item: View, private val listener: ItemChanges): RecyclerView.ViewHolder(item), ChangeAmount {
 
         private var binding = ItemActivityFinanceBinding.bind(item)
-
-        fun bind(data: InformationAboutItemFinance, position: Int, isVisible: Boolean, listener: DeleteItem) {
+        private var position = 0
+        private var isPlus = true
+        fun bind(data: InformationAboutItemFinance, position: Int, isVisible: Boolean) {
             binding.cardView.setCardBackgroundColor(data.color)
             binding.plus.setTextColor(data.color)
             binding.minus.setTextColor(data.color)
             binding.nameTV.text = data.name
             binding.iconImage.setImageResource(data.image)
             binding.clear.isVisible = isVisible
+            this.position = position
 
             if (invertAmount(data.amount))
                 binding.amountTV.text = data.amount.toInt().toString()
@@ -68,7 +70,7 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
                     override fun onAnimationStart(p0: Animation?) {}
                     override fun onAnimationRepeat(p0: Animation?) {}
                     override fun onAnimationEnd(p0: Animation?) {
-                        listener.delete(position)
+                        listener.deleteItem(position)
                     }
                 })
                 itemView.startAnimation(anim)
@@ -78,7 +80,8 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         }
 
         private fun changeAmount(plus: Boolean) {
-            val dialog = DialogChangeAmountItem(itemView.context)
+            isPlus = plus
+            val dialog = DialogChangeAmountItem(itemView.context, this)
             dialog.create()
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
@@ -87,11 +90,18 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         private fun invertAmount(max: Double): Boolean {
             return max == max.toInt().toDouble()
         }
+
+        override fun amountSetChanged(amountItem: Double) {
+            if (isPlus)
+                listener.changeAmount(amountItem, position)
+            else
+                listener.changeAmount(-amountItem, position)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val item = LayoutInflater.from(parent.context).inflate(R.layout.item_activity_finance, parent, false)
-        return ViewHolder(item)
+        return ViewHolder(item, this)
     }
 
     override fun getItemCount(): Int {
@@ -99,7 +109,7 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(mutableListFinanceItem[position], position, checkBoxVisible, this)
+        holder.bind(mutableListFinanceItem[position], position, checkBoxVisible)
     }
 
     fun add(name: String, startCapital: Double, image: Int, color: Int, currency: String) {
@@ -122,12 +132,22 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         val currency: String
         )
 
-    override fun delete(position: Int) {
+    override fun deleteItem(position: Int) {
         mutableListFinanceItem.removeAt(position)
         listener.dataSetChanged()
         notifyDataSetChanged()
     }
+
+    override fun changeAmount(money: Double, position: Int) {
+        mutableListFinanceItem[position].amount += money
+        if (mutableListFinanceItem[position].amount < 0)
+            mutableListFinanceItem[position].amount = 0.0
+        listener.dataSetChanged()
+        notifyDataSetChanged()
+    }
 }
-interface DeleteItem {
-    fun delete(position: Int)
+interface ItemChanges {
+    fun deleteItem(position: Int)
+    fun changeAmount(money: Double, position: Int)
+
 }
