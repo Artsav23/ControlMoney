@@ -7,20 +7,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.controlmoney.ChooseListener
+import com.example.controlmoney.DataStyleItems
 import com.example.controlmoney.R
 import com.example.controlmoney.databinding.ItemRecycleViewIconsBinding
 
 class IconsAdapter(private val listener: ChooseListener): Adapter<IconsAdapter.ViewHolder>(), OnClickListenerItem {
 
-    private val listIcons = listOf(
-        ItemParameters(true, R.drawable.cafe),
-        ItemParameters(false, R.drawable.car),
-        ItemParameters(false, R.drawable.cinema),
-        ItemParameters(false, R.drawable.circus),
-        ItemParameters(false, R.drawable.delivery),
-        ItemParameters(false, R.drawable.gym),
-        ItemParameters(false, R.drawable.home),
-        ItemParameters(false, R.drawable.museum))
+    private val listIcons = DataStyleItems().icons
 
     class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
         private val binding = ItemRecycleViewIconsBinding.bind(item)

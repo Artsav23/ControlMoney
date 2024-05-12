@@ -9,8 +9,8 @@ import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
-import com.example.controlmoney.databinding.ItemActivityFinanceBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.example.controlmoney.databinding.ItemActivityFinanceBinding
 
 
 class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeCountMoney): RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>(),ItemChanges {

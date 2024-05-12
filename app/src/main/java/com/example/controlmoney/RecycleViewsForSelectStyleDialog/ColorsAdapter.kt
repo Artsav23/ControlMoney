@@ -8,24 +8,12 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.controlmoney.ChooseListener
+import com.example.controlmoney.DataStyleItems
 import com.example.controlmoney.R
 
 class ColorsAdapter (private val listener: ChooseListener): Adapter<ColorsAdapter.ViewHolder>(), OnClickListenerItem {
 
-    private val listColors = listOf(
-        ColorParameters(Color.parseColor("#2A2A5F"), true),
-        ColorParameters(Color.parseColor("#3D5AFE"), false),
-        ColorParameters(Color.parseColor("#536DFE"), false),
-        ColorParameters(Color.parseColor("#1E88E5"), false),
-        ColorParameters(Color.parseColor("#1976D2"), false),
-        ColorParameters(Color.parseColor("#1565C0"), false),
-        ColorParameters(Color.parseColor("#0D47A1"), false),
-        ColorParameters(Color.parseColor("#42A5F5"), false),
-        ColorParameters(Color.parseColor("#64B5F6"), false),
-        ColorParameters(Color.parseColor("#90CAF9"), false),
-        ColorParameters(Color.parseColor("#90CAF9"), false),
-        ColorParameters(Color.parseColor("#BBDEFB"), false)
-    )
+    private val listColors = DataStyleItems().colors
 
     class ViewHolder(item: View, private val listenerColor: OnClickListenerItem): RecyclerView.ViewHolder(item) {
         fun bind(colorParameters: ColorParameters, position: Int) {
