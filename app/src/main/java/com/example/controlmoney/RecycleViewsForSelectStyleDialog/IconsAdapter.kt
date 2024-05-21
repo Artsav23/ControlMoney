@@ -7,23 +7,24 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.controlmoney.ChooseListener
-import com.example.controlmoney.DataStyleItems
+import com.example.controlmoney.DataItems
 import com.example.controlmoney.R
 import com.example.controlmoney.databinding.ItemRecycleViewIconsBinding
 
 class IconsAdapter(private val listener: ChooseListener): Adapter<IconsAdapter.ViewHolder>(), OnClickListenerItem {
 
-    private val listIcons = DataStyleItems().icons
+    private val listIcons = DataItems().icons
+    private var choiceColor = Color.parseColor("#BBDEFB")
+    private var checkItem = 0
 
     class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
         private val binding = ItemRecycleViewIconsBinding.bind(item)
 
-        fun bind(itemParameters: ItemParameters, position: Int, listenerItem: OnClickListenerItem) {
-            binding.icon.setImageResource(itemParameters.image)
-            if (itemParameters.isSelected)
-                binding.cardView.setCardBackgroundColor(Color.parseColor("#424B5A"))
-            else
-                binding.cardView.setCardBackgroundColor(Color.parseColor("#373E4A"))
+        fun bind(data: DataItems.ItemParameters, position: Int, listenerItem: OnClickListenerItem, choiceColor: Int) {
+            binding.icon.setImageResource(data.image)
+            binding.icon.setColorFilter(choiceColor)
+            val color = if (data.isSelected) "#424B5A" else "#373E4A"
+            binding.cardView.setCardBackgroundColor(Color.parseColor(color))
 
             itemView.setOnClickListener {
                 listenerItem.clickItem(position)
@@ -36,28 +37,23 @@ class IconsAdapter(private val listener: ChooseListener): Adapter<IconsAdapter.V
         return  ViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return listIcons.size
-    }
+    override fun getItemCount() = listIcons.size
+
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(listIcons[position], position, this)
+        holder.bind(listIcons[position], position, this, choiceColor)
     }
 
     override fun clickItem(position: Int) {
-        var num = 0
-        listIcons.forEach {
-            it.isSelected = position == num
-            if (it.isSelected)
-                listener.changeImageChoice(it.image)
-            num ++
-        }
+        listIcons[checkItem].isSelected = false
+        listIcons[position].isSelected = true
+        listener.changeImageChoice(listIcons[position].image)
+        checkItem = position
         notifyDataSetChanged()
 
     }
-
-    data class ItemParameters(
-        var isSelected: Boolean,
-        val image: Int
-    )
+    fun changeColor(choiceColor: Int) {
+        this.choiceColor = choiceColor
+        notifyDataSetChanged()
+    }
 }

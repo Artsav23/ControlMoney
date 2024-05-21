@@ -9,30 +9,32 @@ import com.example.controlmoney.DialogChangeCurrency.ChangeCurrencyDialog
 import com.example.controlmoney.databinding.DialogAddBinding
 import java.text.DecimalFormat
 
-class AddDialog(context: Context) : Dialog(context), DialogCallBackStyleAndCurrency {
+class AddDialog(context: Context, private val currency: String) : Dialog(context), DialogCallBackStyleAndCurrency {
 
     private lateinit var binding: DialogAddBinding
     private lateinit var callBack: DialogCallBack
     private var icon: Int = R.drawable.home
-    private var color: Int = Color.parseColor("#2A2A5F")
+    private var color: Int = Color.parseColor("#BBDEFB")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DialogAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        changeStyleItem()
-        changeCurrencyItem()
+        binding.currencyTV.text = currency
+        binding.futureIcon.setColorFilter(color)
+        changeStyle()
+        changeCurrency()
         createItem()
     }
 
-    private fun changeCurrencyItem() {
+    private fun changeCurrency() {
         binding.currencyTV.setOnClickListener {
             val dialog = ChangeCurrencyDialog(context, null, this)
             dialog.show()
         }
     }
 
-    private fun changeStyleItem() {
+    private fun changeStyle() {
         binding.cardStyleView.setOnClickListener {
             val styleDialog = SelectStyleDialog(context, this)
             styleDialog.create()
@@ -48,7 +50,8 @@ class AddDialog(context: Context) : Dialog(context), DialogCallBackStyleAndCurre
                 val name = binding.nameEditText.text.toString()
                 val startCapital = binding.startCapitalEditText.text.toString()
                 val currency = binding.currencyTV.text.toString()
-                callBack.returnDataAddItem(name, checkCapital(startCapital), icon, color, currency)
+                val data = DataItems.ItemFinanceParameters(name, checkCapital(startCapital), color, icon, currency)
+                callBack.returnDataAddItem(data)
                 dismiss()
             }
         }
@@ -65,10 +68,11 @@ class AddDialog(context: Context) : Dialog(context), DialogCallBackStyleAndCurre
     }
 
     override fun setDataStyle(icon: Int, color: Int) {
-        binding.cardStyleView.setCardBackgroundColor(color)
-        binding.futureIcon.setImageResource(icon)
         this.icon = icon
         this.color = color
+        binding.cardStyleView.setCardBackgroundColor(color)
+        binding.futureIcon.setImageResource(icon)
+        binding.futureIcon.setColorFilter(color)
     }
 
     override fun setCurrencyName(currency: String) {

@@ -4,8 +4,8 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.controlmoney.RecycleViewsForSelectStyleDialog.ColorsAdapter
 import com.example.controlmoney.RecycleViewsForSelectStyleDialog.IconsAdapter
 import com.example.controlmoney.databinding.DialogSelectStyleBinding
@@ -13,18 +13,17 @@ import com.example.controlmoney.databinding.DialogSelectStyleBinding
 class SelectStyleDialog(context: Context, private val callBack: DialogCallBackStyleAndCurrency): Dialog(context), ChooseListener {
 
     private lateinit var binding: DialogSelectStyleBinding
-    private var choiceColor = Color.parseColor("#2A2A5F")
+    private var choiceColor = Color.parseColor("#BBDEFB")
     private var choiceIcon = R.drawable.cafe
+    private val colorsAdapter = ColorsAdapter(this)
+    private val iconsAdapter = IconsAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DialogSelectStyleBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val colorsAdapter = ColorsAdapter(this)
-        val iconsAdapter = IconsAdapter(this)
         binding.recyclerViewColors.adapter = colorsAdapter
-        binding.recyclerViewColors.layoutManager = LinearLayoutManager(context,
-            LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewColors.layoutManager = GridLayoutManager(context, 5)
         binding.recyclerViewIcons.adapter = iconsAdapter
         binding.recyclerViewIcons.layoutManager = GridLayoutManager(context, 4)
 
@@ -40,6 +39,7 @@ class SelectStyleDialog(context: Context, private val callBack: DialogCallBackSt
 
     override fun changeColorChoice(color: Int) {
         choiceColor = color
+        iconsAdapter.changeColor(choiceColor)
     }
 }
 interface ChooseListener {

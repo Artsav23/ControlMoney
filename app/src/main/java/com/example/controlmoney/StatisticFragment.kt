@@ -11,14 +11,23 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.controlmoney.databinding.FragmentStatisticBinding
 import com.example.controlmoney.DialogChangeCurrency.ChangeCurrencyDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.lang.Exception
+import kotlin.concurrent.thread
 
 
 class StatisticFragment : Fragment(), DialogCallBack, ListenerChangeCountMoney {
 
     private lateinit var binding: FragmentStatisticBinding
-    private val adapter = AdapterForResultsFragmentRecycleView(this)
     private var currency = "RUB"
-
+    private val  adapter = AdapterForResultsFragmentRecycleView(this)
+    private var currencyCheckToday = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentStatisticBinding.inflate(inflater)
@@ -28,6 +37,7 @@ class StatisticFragment : Fragment(), DialogCallBack, ListenerChangeCountMoney {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycleView()
+
         binding.currencyTV.setOnClickListener { showDialogChangeCurrency()}
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -39,6 +49,7 @@ class StatisticFragment : Fragment(), DialogCallBack, ListenerChangeCountMoney {
 
     }
 
+
     private fun showDialogChangeCurrency() {
         val dialog = context?.let { ChangeCurrencyDialog(it, this, null) }
         dialog?.show()
@@ -49,7 +60,7 @@ class StatisticFragment : Fragment(), DialogCallBack, ListenerChangeCountMoney {
     }
 
     private fun startAddDialog() {
-        val  dialog = context?.let { AddDialog(it) }
+        val  dialog = context?.let { AddDialog(it, currency) }
         dialog?.create()
         dialog?.setCallBack(this)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -63,28 +74,40 @@ class StatisticFragment : Fragment(), DialogCallBack, ListenerChangeCountMoney {
         startAnimationBalanceView()
     }
 
-    override fun returnDataAddItem(name: String, startCapital: Double, image: Int, color: Int, currency: String) {
-        adapter.add(name, startCapital, image, color, currency)
+    override fun returnDataAddItem(data: DataItems.ItemFinanceParameters) {
+        adapter.add(data)
         startAnimationBalanceView()
     }
 
     override fun returnCurrencyName(currency: String) {
-        binding.countMoney.text = "Score: " + binding.balanceView.count().toString()
+        binding.countMoney.text = "Total score: " + binding.balanceView.count().toString()
         binding.currencyTV.text = currency
         this.currency = currency
+        runBlocking { ////посмотреть что это такое
+        adapter.currencyConvert(currency)
+        startAnimationBalanceView()
+        }
     }
 
     private fun startAnimationBalanceView() {
-        binding.balanceView.addList(adapter.getList())
-        val count = binding.balanceView.count()
-        val animator = if (invertMaxNum(count))  ValueAnimator.ofInt(0, count.toInt())
-        else ValueAnimator.ofFloat(0f, count.toFloat())
-        animator.duration = 1500
-        animator.addUpdateListener {
-            binding.countMoney.text = "Score: " + it.animatedValue.toString()
+        runBlocking {
+            if (!currencyCheckToday) {
+                adapter.currencyConvert(currency)
+                currencyCheckToday = true
+            }
+
+            val list = adapter.updateConvertCurrencies()
+            binding.balanceView.addList(list)
+            val count = binding.balanceView.count()
+            val animator = if (invertMaxNum(count))  ValueAnimator.ofInt(0, count.toInt())
+            else ValueAnimator.ofFloat(0f, count.toFloat())
+            animator.duration = 1200
+            animator.addUpdateListener {
+                binding.countMoney.text = "Total score: " + it.animatedValue.toString()
+            }
             binding.currencyTV.text = currency
+            animator.start()
         }
-        animator.start()
     }
     private fun invertMaxNum(max: Double): Boolean {
         return max == max.toInt().toDouble()
@@ -95,6 +118,6 @@ class StatisticFragment : Fragment(), DialogCallBack, ListenerChangeCountMoney {
     }
 }
 interface DialogCallBack {
-    fun returnDataAddItem(name: String, startCapital: Double, image: Int, color: Int, currency: String)
+    fun returnDataAddItem(data: DataItems.ItemFinanceParameters)
     fun returnCurrencyName(currency: String)
 }

@@ -4,8 +4,8 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.accessibility.AccessibilityManager.AudioDescriptionRequestedChangeListener
 import androidx.recyclerview.widget.RecyclerView
+import com.example.controlmoney.DataItems
 import com.example.controlmoney.R
 import com.example.controlmoney.RecycleViewsForSelectStyleDialog.OnClickListenerItem
 import com.example.controlmoney.databinding.ItemCurrencyBinding
@@ -13,29 +13,15 @@ import com.example.controlmoney.databinding.ItemCurrencyBinding
 class AdapterCurrency: RecyclerView.Adapter<AdapterCurrency.ViewHolder>(), OnClickListenerItem {
 
     private var positionChooseCurrency = 1
-    private val mutableListCurrency = mutableListOf(
-        CurrencyParameters("BYN"),
-        CurrencyParameters("RUB", true),
-        CurrencyParameters("USD"),
-        CurrencyParameters("EUR"),
-        CurrencyParameters("JPY"),
-        CurrencyParameters("GBP"),
-        CurrencyParameters("AUD"),
-        CurrencyParameters("CAD"),
-        CurrencyParameters("CHF"),
-        CurrencyParameters("CNY"),
-        CurrencyParameters("SEK"),
-        CurrencyParameters("NZD"))
+    private val mutableListCurrency = DataItems().currencies
 
     class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
         private val binding = ItemCurrencyBinding.bind(item)
 
-        fun bind(data: CurrencyParameters, listener: OnClickListenerItem, position: Int) {
-            binding.currencyTextView.text = data.currency
-            if (data.chooseFlag)
-                binding.cardView.setCardBackgroundColor(Color.parseColor("#373E4A"))
-            else
-                binding.cardView.setCardBackgroundColor(Color.parseColor("#2F343E"))
+        fun bind(data: DataItems.CurrencyParameters, listener: OnClickListenerItem, position: Int) {
+            binding.currencyTextView.text = data.nameCurrency
+            val color = if (data.chooseFlag) "#373E4A" else "#2F343E"
+            binding.cardView.setCardBackgroundColor(Color.parseColor(color))
             itemView.setOnClickListener { listener.clickItem(position) }
         }
     }
@@ -50,20 +36,13 @@ class AdapterCurrency: RecyclerView.Adapter<AdapterCurrency.ViewHolder>(), OnCli
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(mutableListCurrency[position], this, position)
     }
-    data class CurrencyParameters (
-        val currency: String,
-        var chooseFlag: Boolean = false
-    )
 
     override fun clickItem(position: Int) {
+        mutableListCurrency[positionChooseCurrency].chooseFlag = false
+        mutableListCurrency[position].chooseFlag = true
         positionChooseCurrency = position
-        var num = 0
-        mutableListCurrency.forEach {
-            it.chooseFlag = num == position
-            num++
-        }
         notifyDataSetChanged()
     }
 
-    fun getChooseCurrency(): String = mutableListCurrency[positionChooseCurrency].currency
+    fun getChooseCurrency(): String = mutableListCurrency[positionChooseCurrency].nameCurrency
 }

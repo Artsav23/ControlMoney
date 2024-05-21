@@ -7,6 +7,8 @@ import android.graphics.Canvas
 import android.content.Context
 import android.util.AttributeSet
 import android.animation.ValueAnimator
+import android.util.Log
+import kotlin.math.log
 
 class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
 
@@ -14,14 +16,6 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
         color = Color.parseColor("#23238B")
         style = Paint.Style.STROKE
         strokeWidth = 60f
-    }
-
-    private val paintText = Paint().apply {
-        color = Color.WHITE
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        textSize = 68f
-        strokeWidth = 30f
     }
 
     private var financeList = mutableListOf<FinanceParameters>(
@@ -66,7 +60,7 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
     private fun startAnimation() {
         animator = ValueAnimator.ofFloat(0f, 1f)
         animator.apply {
-            duration = 1500
+            duration = 1200
             addUpdateListener {
                 invalidate()
             }
@@ -93,10 +87,10 @@ class BalanceView(context: Context, attributeSet: AttributeSet) : View(context, 
         }
     }
 
-    fun addList(list: MutableList<AdapterForResultsFragmentRecycleView.InformationAboutItemFinance>) {
+    fun addList(list: MutableList<DataItems.ItemFinanceParameters>) {
         financeList.clear()
         list.forEach {
-            financeList.add(FinanceParameters(it.amount, it.color))
+            financeList.add(FinanceParameters(it.convertCurrency, it.color))
         }
         countMaxFinance()
         startAnimation()

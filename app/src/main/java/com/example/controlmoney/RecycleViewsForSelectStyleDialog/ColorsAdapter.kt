@@ -8,23 +8,22 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.controlmoney.ChooseListener
-import com.example.controlmoney.DataStyleItems
+import com.example.controlmoney.DataItems
 import com.example.controlmoney.R
 
 class ColorsAdapter (private val listener: ChooseListener): Adapter<ColorsAdapter.ViewHolder>(), OnClickListenerItem {
 
-    private val listColors = DataStyleItems().colors
+    private val listColors = DataItems().colorsParameters
+    private var checkItem = 0
 
     class ViewHolder(item: View, private val listenerColor: OnClickListenerItem): RecyclerView.ViewHolder(item) {
-        fun bind(colorParameters: ColorParameters, position: Int) {
+        fun bind(data: DataItems.ColorParameters, position: Int) {
 
             val colorView = itemView.findViewById<CardView>(R.id.colorView)
             val cardView = itemView.findViewById<CardView>(R.id.cardView)
-            colorView.setCardBackgroundColor(colorParameters.color)
-            if (colorParameters.chooseFlag)
-                cardView.setCardBackgroundColor(Color.parseColor("#373E4A"))
-            else
-                cardView.setCardBackgroundColor(Color.parseColor("#2F343E"))
+            colorView.setCardBackgroundColor(data.color)
+            val color = if (data.chooseFlag) "#373E4A" else "#2F343E"
+            cardView.setCardBackgroundColor(Color.parseColor(color))
 
             itemView.setOnClickListener {
                 listenerColor.clickItem(position)
@@ -37,27 +36,18 @@ class ColorsAdapter (private val listener: ChooseListener): Adapter<ColorsAdapte
         return ViewHolder(view, this)
     }
 
-    override fun getItemCount(): Int {
-        return listColors.size
-    }
+    override fun getItemCount() = listColors.size
+
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(listColors[position], position)
     }
 
-    data class ColorParameters (
-        val color: Int,
-        var chooseFlag: Boolean
-        )
-
     override fun clickItem(position: Int) {
-        var num = 0
-        listColors.forEach {
-            it.chooseFlag = num == position
-            if (it.chooseFlag)
-                listener.changeColorChoice(it.color)
-            num++
-        }
+        listColors[checkItem].chooseFlag = false
+        listColors[position].chooseFlag = true
+        listener.changeColorChoice(listColors[position].color)
+        checkItem = position
         notifyDataSetChanged()
     }
 }

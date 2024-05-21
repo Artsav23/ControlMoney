@@ -2,15 +2,27 @@ package com.example.controlmoney
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
-import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
+import android.view.animation.Animation.AnimationListener
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.example.controlmoney.databinding.ItemActivityFinanceBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.lang.Exception
+import java.text.DecimalFormat
 
 
 class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeCountMoney): RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>(),ItemChanges {
@@ -29,41 +41,32 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         Color.parseColor("#90CAF9"),
         Color.parseColor("#BBDEFB"),
     )
+    private var listCurrencies = DataItems().currencies
+
 
     private var mutableListFinanceItem = mutableListOf(
-        InformationAboutItemFinance("Кредит", 230.0,  listColors[0], R.drawable.cafe, "RUB"),
-        InformationAboutItemFinance("Коммуналка", 560.0,  listColors[1], R.drawable.home, "RUB"),
-        InformationAboutItemFinance("Продукты", 136.38,  listColors[2], R.drawable.cinema, "RUB"),
-        InformationAboutItemFinance("Подарок на 8 марта", 60.78,  listColors[3], R.drawable.delivery, "RUB"),
-        InformationAboutItemFinance("Развлечение", 78.03,  listColors[4], R.drawable.cinema, "RUB"),
-        InformationAboutItemFinance("Ресторан", 120.45,  listColors[5], R.drawable.cafe, "RUB"),
-        InformationAboutItemFinance("Credit", 1.0,  listColors[6], R.drawable.home, "RUB"),
-        InformationAboutItemFinance("Credit", 1.0,  listColors[7], R.drawable.home, "RUB"),
-        InformationAboutItemFinance("Credit", 1.0,  listColors[8], R.drawable.home, "RUB"),
-        InformationAboutItemFinance("Credit", 1.0,  listColors[9], R.drawable.cafe, "RUB"),
-        InformationAboutItemFinance("Credit", 1.0,  listColors[10], R.drawable.home, "RUB")
+        DataItems.ItemFinanceParameters("Кредит", 230.0,  listColors[0], R.drawable.cafe, "RUB"),
+        DataItems.ItemFinanceParameters("Коммуналка", 560.0,  listColors[1], R.drawable.home, "USD"),
+        DataItems.ItemFinanceParameters("Продукты", 136.38, listColors[2], R.drawable.cinema, "RUB"),
+        DataItems.ItemFinanceParameters("Подарок на 8 марта", 60.78,  listColors[3], R.drawable.delivery, "RUB"),
+        DataItems.ItemFinanceParameters("Развлечение", 78.03,  listColors[4], R.drawable.cinema, "RUB"),
+        DataItems.ItemFinanceParameters("Ресторан", 120.45,  listColors[5], R.drawable.cafe, "RUB"),
+        DataItems.ItemFinanceParameters("Credit", 1.0,  listColors[6], R.drawable.home, "RUB"),
+        DataItems.ItemFinanceParameters("Credit", 1.0,  listColors[7], R.drawable.home, "RUB"),
+        DataItems.ItemFinanceParameters("Credit", 1.0,  listColors[8], R.drawable.home, "RUB"),
+        DataItems.ItemFinanceParameters("Credit", 1.0,  listColors[9], R.drawable.cafe, "RUB"),
+        DataItems.ItemFinanceParameters("Credit", 1.0,  listColors[10], R.drawable.home, "RUB")
     )
     class ViewHolder(item: View, private val listener: ItemChanges): RecyclerView.ViewHolder(item), ChangeAmount {
 
         private var binding = ItemActivityFinanceBinding.bind(item)
         private var position = 0
         private var isPlus = true
-        fun bind(data: InformationAboutItemFinance, position: Int, isVisible: Boolean) {
-            binding.cardView.setCardBackgroundColor(data.color)
-            binding.plus.setTextColor(data.color)
-            binding.minus.setTextColor(data.color)
-            binding.nameTV.text = data.name
-            binding.iconImage.setImageResource(data.image)
-            binding.clear.isVisible = isVisible
+        fun bind(data: DataItems.ItemFinanceParameters, position: Int, isVisible: Boolean) {
+            initAllObjects(data, isVisible)
             this.position = position
-
-            if (invertAmount(data.amount))
-                binding.amountTV.text = data.amount.toInt().toString()
-            else
-            binding.amountTV.text = data.amount.toString()
-
-            binding.amountTV.text = binding.amountTV.text.toString() + " ${data.currency}"
-
+            binding.plus.setOnClickListener { changeAmount(true) }
+            binding.minus.setOnClickListener { changeAmount(false) }
             binding.clear.setOnClickListener {
                 val anim = AnimationUtils.loadAnimation(itemView.context, R.anim.delete_anim)
                 anim.setAnimationListener(object : AnimationListener {
@@ -75,9 +78,23 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
                 })
                 itemView.startAnimation(anim)
             }
-            binding.plus.setOnClickListener { changeAmount(true) }
-            binding.minus.setOnClickListener { changeAmount(false) }
         }
+
+        private fun initAllObjects(data: DataItems.ItemFinanceParameters, isVisible: Boolean) {
+            binding.cardView.setCardBackgroundColor(data.color)
+            binding.nameTV.text = data.name
+            binding.iconImage.setImageResource(data.image)
+            binding.iconImage.setColorFilter(data.color)
+            binding.clear.isVisible = isVisible
+
+            if (invertAmount(data.amount))
+                binding.amountTV.text = data.amount.toInt().toString()
+            else
+                binding.amountTV.text = data.amount.toString()
+
+            binding.amountTV.text = "${binding.amountTV.text} ${data.currency}"
+        }
+
 
         private fun changeAmount(plus: Boolean) {
             isPlus = plus
@@ -87,33 +104,47 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
             dialog.show()
         }
 
-        private fun invertAmount(max: Double): Boolean {
-            return max == max.toInt().toDouble()
-        }
+        private fun invertAmount(max: Double) = max == max.toInt().toDouble()
 
         override fun amountSetChanged(amountItem: Double) {
-            if (isPlus)
-                listener.changeAmount(amountItem, position)
-            else
-                listener.changeAmount(-amountItem, position)
+            val amount = if (isPlus) amountItem else -amountItem
+            listener.changeAmount(amount, position)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val item = LayoutInflater.from(parent.context).inflate(R.layout.item_activity_finance, parent, false)
-        return ViewHolder(item, this)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_activity_finance, parent, false)
+        return ViewHolder(view, this)
     }
 
-    override fun getItemCount(): Int {
-        return mutableListFinanceItem.count()
-    }
+    override fun getItemCount() = mutableListFinanceItem.count()
+
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(mutableListFinanceItem[position], position, checkBoxVisible)
     }
 
-    fun add(name: String, startCapital: Double, image: Int, color: Int, currency: String) {
-        mutableListFinanceItem.add(InformationAboutItemFinance(name, startCapital, color, image, currency))
+    suspend fun currencyConvert(currency: String) {
+        val client = OkHttpClient()
+        val url =  DataApiCurrency().url + currency
+        val request = Request.Builder().url(url).build()
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    val jsonObject = JSONObject(response.body?.string()).getJSONObject("conversion_rates")
+                    Log.d("my_log", jsonObject.toString())
+                    listCurrencies.forEach {
+                        it.prices = DecimalFormat("#.##").format(jsonObject.getDouble(it.nameCurrency)).toDouble()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+    fun add(data: DataItems.ItemFinanceParameters) {
+        mutableListFinanceItem.add(data)
         notifyDataSetChanged()
     }
 
@@ -123,14 +154,6 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         checkBoxVisible = !checkBoxVisible
         notifyDataSetChanged()
     }
-
-    data class InformationAboutItemFinance(
-        val name: String,
-        var amount: Double,
-        val color: Int,
-        var image: Int,
-        val currency: String
-        )
 
     override fun deleteItem(position: Int) {
         mutableListFinanceItem.removeAt(position)
@@ -145,6 +168,18 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         listener.dataSetChanged()
         notifyDataSetChanged()
     }
+
+    fun updateConvertCurrencies(): MutableList<DataItems.ItemFinanceParameters> {
+    mutableListFinanceItem.forEach { item ->
+        listCurrencies.forEach { currency ->
+            if (item.currency == currency.nameCurrency)
+                item.convertCurrency = DecimalFormat("#.##").format(item.amount / currency.prices).toDouble()
+        }
+    }
+        return mutableListFinanceItem
+    }
+
+
 }
 interface ItemChanges {
     fun deleteItem(position: Int)
