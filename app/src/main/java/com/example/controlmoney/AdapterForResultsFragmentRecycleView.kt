@@ -23,6 +23,8 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.lang.Exception
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 
 class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeCountMoney): RecyclerView.Adapter<AdapterForResultsFragmentRecycleView.ViewHolder>(),ItemChanges {
@@ -126,20 +128,35 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
 
     suspend fun currencyConvert(currency: String) {
         val client = OkHttpClient()
-        val url =  DataApiCurrency().url + currency
+        val url = DataApiCurrency().url + currency
         val request = Request.Builder().url(url).build()
-        return withContext(Dispatchers.IO) {
+
+        withContext(Dispatchers.IO) {
             try {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
                     val jsonObject = JSONObject(response.body?.string()).getJSONObject("conversion_rates")
                     Log.d("my_log", jsonObject.toString())
-                    listCurrencies.forEach {
-                        it.prices = DecimalFormat("#.##").format(jsonObject.getDouble(it.nameCurrency)).toDouble()
+
+                    val symbols = DecimalFormatSymbols(Locale.getDefault()).apply {
+                        decimalSeparator = '.'
                     }
+                    val decimalFormat = DecimalFormat("#.##", symbols)
+                    listCurrencies.forEach {
+                        try {
+                            val priceString = decimalFormat.format(jsonObject.getDouble(it.nameCurrency))
+                            Log.d("my_log", "Formatted price for ${it.nameCurrency}: $priceString")
+                            it.prices = priceString.toDouble()
+                        } catch (e: NumberFormatException) {
+                            Log.e("CurrencyConversion", "Error converting formatted price to double: ${e.message}")
+                        }
+                    }
+                } else {
+                    Log.e("CurrencyConversion", "Response not successful: ${response.code}")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                Log.e("CurrencyConversion", "Exception during currency conversion: ${e.message}")
             }
         }
     }
@@ -169,15 +186,28 @@ class AdapterForResultsFragmentRecycleView(private val listener: ListenerChangeC
         notifyDataSetChanged()
     }
 
+
     fun updateConvertCurrencies(): MutableList<DataItems.ItemFinanceParameters> {
-    mutableListFinanceItem.forEach { item ->
-        listCurrencies.forEach { currency ->
-            if (item.currency == currency.nameCurrency)
-                item.convertCurrency = DecimalFormat("#.##").format(item.amount / currency.prices).toDouble()
+        val symbols = DecimalFormatSymbols(Locale.getDefault()).apply {
+            decimalSeparator = '.'
         }
-    }
+        val decimalFormat = DecimalFormat("#.##", symbols)
+
+        mutableListFinanceItem.forEach { item ->
+            listCurrencies.forEach { currency ->
+                if (item.currency == currency.nameCurrency) {
+                    try {
+                        val formattedValue = decimalFormat.format(item.amount / currency.prices)
+                        item.convertCurrency = formattedValue.toDouble()
+                    } catch (e: NumberFormatException) {
+                        Log.e("CurrencyConversion", "Error converting value to number: ${e.message}")
+                    }
+                }
+            }
+        }
         return mutableListFinanceItem
     }
+
 
 
 }

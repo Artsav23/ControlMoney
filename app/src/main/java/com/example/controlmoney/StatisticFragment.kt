@@ -95,7 +95,6 @@ class StatisticFragment : Fragment(), DialogCallBack, ListenerChangeCountMoney {
                 adapter.currencyConvert(currency)
                 currencyCheckToday = true
             }
-
             val list = adapter.updateConvertCurrencies()
             binding.balanceView.addList(list)
             val count = binding.balanceView.count()

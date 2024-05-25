@@ -28,9 +28,10 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="icon_clear" />
-                            <entry key="sourceFile" value="C:\Users\savva\Рабочий стол\trash.svg" />
+                            <entry key="outputName" value="suitcase" />
+                            <entry key="sourceFile" value="C:\Users\savva\Рабочий стол\suitcase.svg" />
                           </map>
                         </option>
                       </PersistentState>
